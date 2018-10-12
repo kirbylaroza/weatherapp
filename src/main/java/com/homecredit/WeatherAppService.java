@@ -7,15 +7,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import javax.xml.crypto.Data;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
 public class WeatherAppService {
+    private EntityManager entityManager;
 
     private static List<Weather> weathers = new ArrayList<>();
     private WeatherAppRepository weatherAppRepository;
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    private Date date = new Date();
 
     @Autowired
     public WeatherAppService(WeatherAppRepository weatherAppRepository){
@@ -25,6 +32,7 @@ public class WeatherAppService {
 
 
     public List<Weather> getWeather() {
+
         final ArrayList weatherMapURI = new ArrayList<>();
         List<Weather> weathers = new ArrayList<>();
 
@@ -59,8 +67,9 @@ public class WeatherAppService {
                 JSONObject jsonObjTemp = new JSONObject(jObj.getString("main"));
                 cityTemp = jsonObjTemp.getString("temp");
 
-                System.out.println("City: " + cityName + ", Temp: " + cityTemp + "F, Weather Forecast: " + cityWeather);
-                weathers.add(new Weather(x, cityName, cityWeather, cityTemp));
+
+                weathers.add(new Weather(x, cityName, cityWeather, cityTemp, date));
+                //insertWeatherData(x, cityName, cityWeather, cityTemp);
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -69,5 +78,17 @@ public class WeatherAppService {
 
         this.weatherAppRepository.findAll().forEach(weathers::add);
         return weathers;
+    }
+
+
+    public void insertWeatherData(int responseId, String cityName, String cityWeather, String cityTemp){
+        System.out.println("Response ID: " + responseId + ", City: " + cityName + ", Temp: " + cityTemp + "F, Weather Forecast: " + cityWeather + ", Date/Time Inserted: " + dateFormat.format(date));
+        Query query = entityManager.createNativeQuery("INSERT INTO WEATHERLOG (RESPONSEID, LOCATION, ACTUALWEATHER, TEMPERATURE, DTIMEINSERTED) VALUES(?,?,?,?,?)");
+        query.setParameter(1, responseId);
+        query.setParameter(2, cityName);
+        query.setParameter(3, cityWeather);
+        query.setParameter(4, cityTemp);
+        query.setParameter(5, date);
+        query.executeUpdate();
     }
 }

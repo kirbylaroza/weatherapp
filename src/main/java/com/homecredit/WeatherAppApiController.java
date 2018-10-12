@@ -24,4 +24,9 @@ public class WeatherAppApiController {
         return this.weatherAppService.getWeather();
     }
 
+    @GetMapping("getweatherdb")
+    public List<Weather> getWeatherdb(){
+        return this.weatherAppService.getWeather();
+    }
+
 }

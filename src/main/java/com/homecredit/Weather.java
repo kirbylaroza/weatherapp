@@ -1,6 +1,7 @@
 package com.homecredit;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name="WEATHERLOG")
@@ -20,16 +21,20 @@ public class Weather {
     @Column(name = "TEMPERATURE")
     private String temperature;
 
+    @Column(name = "DTIMEINSERTED")
+    private Date timeStamp;
+
     public Weather() {
         super();
     }
 
-    public Weather(long id, String cityName, String actualWeather, String temperature) {
+    public Weather(long id, String cityName, String actualWeather, String temperature, Date timeStamp) {
         super();
         this.id = id;
         this.cityName = cityName;
         this.actualWeather = actualWeather;
         this.temperature = temperature;
+        this.timeStamp = timeStamp;
     }
 
     public long getId() {
@@ -61,6 +66,14 @@ public class Weather {
     }
 
     public void setTemperature(String temperature) {
+        this.temperature = temperature;
+    }
+
+    public Date getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(Date timeStamp) {
         this.temperature = temperature;
     }
 }
